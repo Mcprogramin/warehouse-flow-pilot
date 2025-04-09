@@ -45,16 +45,19 @@ const ProtectedRoute = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Show loading state
   if (loading) {
     return <div className="flex h-screen w-full items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
     </div>;
   }
 
+  // Redirect to auth page if no user
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
+  // User is authenticated, render the children
   return children;
 };
 

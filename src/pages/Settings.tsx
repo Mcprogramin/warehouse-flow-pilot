@@ -33,11 +33,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
+// Define the shape of user settings to help TypeScript recognize the structure
+interface UserSettings {
+  pathfinding_algorithm: string;
+  computation_priority: number;
+  dynamic_rerouting: boolean;
+  storage_strategy: string;
+  auto_reorganization: boolean;
+  speed_limit: number;
+  recharge_threshold: number;
+  collision_avoidance: boolean;
+  automated_charging: boolean;
+  theme: string;
+  animations_enabled: boolean;
+  realtime_updates: boolean;
+  update_frequency: number;
+}
+
 const Settings = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
 
   // Create form for system settings
   const systemForm = useForm({
@@ -81,41 +98,50 @@ const Settings = () => {
       setUser(data.user);
       
       // Load user settings
-      const { data: settingsData, error } = await supabase
-        .from('user_settings')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error loading settings:', error);
-        return;
-      }
-      
-      if (settingsData) {
-        // Update system form
-        systemForm.reset({
-          algorithmType: settingsData.pathfinding_algorithm || "astar",
-          computationPriority: [settingsData.computation_priority || 70],
-          dynamicRerouting: settingsData.dynamic_rerouting !== null ? settingsData.dynamic_rerouting : true,
-          storageStrategy: settingsData.storage_strategy || "frequent",
-          autoReorganization: settingsData.auto_reorganization !== null ? settingsData.auto_reorganization : true
-        });
+      try {
+        const { data: settingsData, error } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
         
-        // Update robot form
-        robotForm.reset({
-          speedLimit: [settingsData.speed_limit || 1.2],
-          rechargeThreshold: settingsData.recharge_threshold || 20,
-          collisionAvoidance: settingsData.collision_avoidance !== null ? settingsData.collision_avoidance : true,
-          automatedCharging: settingsData.automated_charging !== null ? settingsData.automated_charging : true
-        });
+        if (error) {
+          console.error('Error loading settings:', error);
+          return;
+        }
         
-        // Update appearance form
-        appearanceForm.reset({
-          theme: settingsData.theme || "light",
-          animations: settingsData.animations_enabled !== null ? settingsData.animations_enabled : true,
-          realtimeUpdates: settingsData.realtime_updates !== null ? settingsData.realtime_updates : true,
-          updateFrequency: String(settingsData.update_frequency || 5)
+        if (settingsData) {
+          // Update system form
+          systemForm.reset({
+            algorithmType: settingsData.pathfinding_algorithm || "astar",
+            computationPriority: [settingsData.computation_priority || 70],
+            dynamicRerouting: settingsData.dynamic_rerouting !== null ? settingsData.dynamic_rerouting : true,
+            storageStrategy: settingsData.storage_strategy || "frequent",
+            autoReorganization: settingsData.auto_reorganization !== null ? settingsData.auto_reorganization : true
+          });
+          
+          // Update robot form
+          robotForm.reset({
+            speedLimit: [settingsData.speed_limit || 1.2],
+            rechargeThreshold: settingsData.recharge_threshold || 20,
+            collisionAvoidance: settingsData.collision_avoidance !== null ? settingsData.collision_avoidance : true,
+            automatedCharging: settingsData.automated_charging !== null ? settingsData.automated_charging : true
+          });
+          
+          // Update appearance form
+          appearanceForm.reset({
+            theme: settingsData.theme || "light",
+            animations: settingsData.animations_enabled !== null ? settingsData.animations_enabled : true,
+            realtimeUpdates: settingsData.realtime_updates !== null ? settingsData.realtime_updates : true,
+            updateFrequency: String(settingsData.update_frequency || 5)
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+        toast({
+          variant: "destructive",
+          title: "Error loading settings",
+          description: "Failed to load your settings. Please try again later.",
         });
       }
     };
