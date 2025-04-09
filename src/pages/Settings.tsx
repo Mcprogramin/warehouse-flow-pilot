@@ -1,4 +1,6 @@
 
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import Dashboard from "@/components/layout/Dashboard";
 import { 
   Card, 
@@ -27,8 +29,135 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Create form for system settings
+  const systemForm = useForm({
+    defaultValues: {
+      algorithmType: "astar",
+      computationPriority: [70],
+      dynamicRerouting: true,
+      storageStrategy: "frequent",
+      autoReorganization: true
+    }
+  });
+
+  // Create form for robot settings
+  const robotForm = useForm({
+    defaultValues: {
+      speedLimit: [1.2],
+      rechargeThreshold: 20,
+      collisionAvoidance: true,
+      automatedCharging: true
+    }
+  });
+
+  // Create form for appearance settings
+  const appearanceForm = useForm({
+    defaultValues: {
+      theme: "light",
+      animations: true,
+      realtimeUpdates: true,
+      updateFrequency: "5"
+    }
+  });
+
+  const onSystemSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .update({
+          pathfinding_algorithm: data.algorithmType,
+          computation_priority: data.computationPriority[0],
+          dynamic_rerouting: data.dynamicRerouting,
+          storage_strategy: data.storageStrategy,
+          auto_reorganization: data.autoReorganization,
+          updated_at: new Date()
+        })
+        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+
+      if (error) throw error;
+      toast({
+        title: "Settings saved",
+        description: "Your system settings have been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error saving settings",
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onRobotSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .update({
+          speed_limit: data.speedLimit[0],
+          recharge_threshold: data.rechargeThreshold,
+          collision_avoidance: data.collisionAvoidance,
+          automated_charging: data.automatedCharging,
+          updated_at: new Date()
+        })
+        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+
+      if (error) throw error;
+      toast({
+        title: "Settings saved",
+        description: "Your robot settings have been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error saving settings",
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onAppearanceSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .update({
+          theme: data.theme,
+          animations_enabled: data.animations,
+          realtime_updates: data.realtimeUpdates,
+          update_frequency: parseInt(data.updateFrequency),
+          updated_at: new Date()
+        })
+        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+
+      if (error) throw error;
+      toast({
+        title: "Settings saved",
+        description: "Your appearance settings have been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error saving settings",
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Dashboard>
       <div className="space-y-6">
@@ -49,47 +178,87 @@ const Settings = () => {
                   Configure the pathfinding algorithm used by robots
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1">
-                  <FormLabel>Algorithm Type</FormLabel>
-                  <RadioGroup defaultValue="astar" className="flex flex-col space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="astar" id="astar" />
-                      <label htmlFor="astar" className="text-sm">A* (Recommended)</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="dijkstra" id="dijkstra" />
-                      <label htmlFor="dijkstra" className="text-sm">Dijkstra</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="custom" id="custom" />
-                      <label htmlFor="custom" className="text-sm">Custom Algorithm</label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div className="space-y-1">
-                  <FormLabel>Computation Priority</FormLabel>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Speed</span>
-                      <span className="text-sm">Accuracy</span>
-                    </div>
-                    <Slider defaultValue={[70]} max={100} step={10} />
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Enable Dynamic Rerouting</FormLabel>
-                    <Switch defaultChecked />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Allow robots to recalculate routes when obstacles are detected
-                  </p>
-                </div>
+              <CardContent>
+                <Form {...systemForm}>
+                  <form onSubmit={systemForm.handleSubmit(onSystemSubmit)} className="space-y-4">
+                    <FormField
+                      control={systemForm.control}
+                      name="algorithmType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Algorithm Type</FormLabel>
+                          <RadioGroup 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value} 
+                            className="flex flex-col space-y-2"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="astar" id="astar" />
+                              <label htmlFor="astar" className="text-sm">A* (Recommended)</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="dijkstra" id="dijkstra" />
+                              <label htmlFor="dijkstra" className="text-sm">Dijkstra</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="custom" id="custom" />
+                              <label htmlFor="custom" className="text-sm">Custom Algorithm</label>
+                            </div>
+                          </RadioGroup>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={systemForm.control}
+                      name="computationPriority"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Computation Priority</FormLabel>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm">Speed</span>
+                              <span className="text-sm">Accuracy</span>
+                            </div>
+                            <FormControl>
+                              <Slider 
+                                value={field.value} 
+                                onValueChange={field.onChange}
+                                max={100} 
+                                step={10} 
+                              />
+                            </FormControl>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={systemForm.control}
+                      name="dynamicRerouting"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Enable Dynamic Rerouting</FormLabel>
+                            <FormControl>
+                              <Switch 
+                                checked={field.value} 
+                                onCheckedChange={field.onChange} 
+                              />
+                            </FormControl>
+                          </div>
+                          <FormDescription>
+                            Allow robots to recalculate routes when obstacles are detected
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
 
-                <Button>Save Changes</Button>
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </form>
+                </Form>
               </CardContent>
             </Card>
             
@@ -100,36 +269,63 @@ const Settings = () => {
                   Configure how packages are assigned to shelves
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1">
-                  <FormLabel>Storage Strategy</FormLabel>
-                  <RadioGroup defaultValue="frequent" className="flex flex-col space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="frequent" id="frequent" />
-                      <label htmlFor="frequent" className="text-sm">Frequency-based (frequently accessed items closer)</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="category" id="category" />
-                      <label htmlFor="category" className="text-sm">Category-based grouping</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="random" id="random" />
-                      <label htmlFor="random" className="text-sm">Random assignment</label>
-                    </div>
-                  </RadioGroup>
-                </div>
+              <CardContent>
+                <Form {...systemForm}>
+                  <form className="space-y-4">
+                    <FormField
+                      control={systemForm.control}
+                      name="storageStrategy"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Storage Strategy</FormLabel>
+                          <RadioGroup 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value} 
+                            className="flex flex-col space-y-2"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="frequent" id="frequent" />
+                              <label htmlFor="frequent" className="text-sm">Frequency-based (frequently accessed items closer)</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="category" id="category" />
+                              <label htmlFor="category" className="text-sm">Category-based grouping</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="random" id="random" />
+                              <label htmlFor="random" className="text-sm">Random assignment</label>
+                            </div>
+                          </RadioGroup>
+                        </FormItem>
+                      )}
+                    />
 
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Enable Automatic Reorganization</FormLabel>
-                    <Switch defaultChecked />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Periodically reorganize stored items based on access patterns
-                  </p>
-                </div>
+                    <FormField
+                      control={systemForm.control}
+                      name="autoReorganization"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Enable Automatic Reorganization</FormLabel>
+                            <FormControl>
+                              <Switch 
+                                checked={field.value} 
+                                onCheckedChange={field.onChange} 
+                              />
+                            </FormControl>
+                          </div>
+                          <FormDescription>
+                            Periodically reorganize stored items based on access patterns
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
 
-                <Button>Save Changes</Button>
+                    <Button disabled={isLoading} onClick={systemForm.handleSubmit(onSystemSubmit)}>
+                      {isLoading ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </form>
+                </Form>
               </CardContent>
             </Card>
           </TabsContent>
@@ -142,53 +338,108 @@ const Settings = () => {
                   Manage robot behavior and performance settings
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1">
-                  <FormLabel>Speed Limit</FormLabel>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">0.5 m/s</span>
-                      <span className="text-sm">2.0 m/s</span>
-                    </div>
-                    <Slider defaultValue={[1.2]} min={0.5} max={2.0} step={0.1} />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Current: 1.2 m/s
-                  </p>
-                </div>
-                
-                <div className="space-y-1">
-                  <FormLabel>Battery Management</FormLabel>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Recharge when below:</span>
-                    <div className="flex items-center space-x-2">
-                      <Input type="number" defaultValue={20} className="w-16 h-8" />
-                      <span className="text-sm">%</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Collision Avoidance</FormLabel>
-                    <Switch defaultChecked />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Enable advanced collision detection and avoidance
-                  </p>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Automated Charging</FormLabel>
-                    <Switch defaultChecked />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Allow robots to autonomously seek charging stations when needed
-                  </p>
-                </div>
+              <CardContent>
+                <Form {...robotForm}>
+                  <form onSubmit={robotForm.handleSubmit(onRobotSubmit)} className="space-y-4">
+                    <FormField
+                      control={robotForm.control}
+                      name="speedLimit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Speed Limit</FormLabel>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm">0.5 m/s</span>
+                              <span className="text-sm">2.0 m/s</span>
+                            </div>
+                            <FormControl>
+                              <Slider 
+                                value={field.value} 
+                                onValueChange={field.onChange}
+                                min={0.5} 
+                                max={2.0} 
+                                step={0.1} 
+                              />
+                            </FormControl>
+                          </div>
+                          <FormDescription>
+                            Current: {field.value} m/s
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={robotForm.control}
+                      name="rechargeThreshold"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Battery Management</FormLabel>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Recharge when below:</span>
+                            <div className="flex items-center space-x-2">
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                  className="w-16 h-8" 
+                                />
+                              </FormControl>
+                              <span className="text-sm">%</span>
+                            </div>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={robotForm.control}
+                      name="collisionAvoidance"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Collision Avoidance</FormLabel>
+                            <FormControl>
+                              <Switch 
+                                checked={field.value} 
+                                onCheckedChange={field.onChange} 
+                              />
+                            </FormControl>
+                          </div>
+                          <FormDescription>
+                            Enable advanced collision detection and avoidance
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={robotForm.control}
+                      name="automatedCharging"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Automated Charging</FormLabel>
+                            <FormControl>
+                              <Switch 
+                                checked={field.value} 
+                                onCheckedChange={field.onChange} 
+                              />
+                            </FormControl>
+                          </div>
+                          <FormDescription>
+                            Allow robots to autonomously seek charging stations when needed
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
 
-                <Button>Save Changes</Button>
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </form>
+                </Form>
               </CardContent>
             </Card>
           </TabsContent>
@@ -201,64 +452,112 @@ const Settings = () => {
                   Customize how the dashboard looks and feels
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1">
-                  <FormLabel>Theme</FormLabel>
-                  <RadioGroup defaultValue="light" className="flex flex-col space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="light" id="light" />
-                      <label htmlFor="light" className="text-sm">Light</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="dark" id="dark" />
-                      <label htmlFor="dark" className="text-sm">Dark</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="system" id="system" />
-                      <label htmlFor="system" className="text-sm">System preference</label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Animations</FormLabel>
-                    <Switch defaultChecked />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Enable animations in the dashboard
-                  </p>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Real-time Updates</FormLabel>
-                    <Switch defaultChecked />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Update dashboard data in real-time
-                  </p>
-                </div>
-                
-                <div className="space-y-1">
-                  <FormLabel>Update Frequency</FormLabel>
-                  <RadioGroup defaultValue="5" className="flex flex-col space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="1" id="1sec" />
-                      <label htmlFor="1sec" className="text-sm">1 second (may impact performance)</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="5" id="5sec" />
-                      <label htmlFor="5sec" className="text-sm">5 seconds</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="15" id="15sec" />
-                      <label htmlFor="15sec" className="text-sm">15 seconds</label>
-                    </div>
-                  </RadioGroup>
-                </div>
+              <CardContent>
+                <Form {...appearanceForm}>
+                  <form onSubmit={appearanceForm.handleSubmit(onAppearanceSubmit)} className="space-y-4">
+                    <FormField
+                      control={appearanceForm.control}
+                      name="theme"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Theme</FormLabel>
+                          <RadioGroup 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value} 
+                            className="flex flex-col space-y-2"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="light" id="light" />
+                              <label htmlFor="light" className="text-sm">Light</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="dark" id="dark" />
+                              <label htmlFor="dark" className="text-sm">Dark</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="system" id="system" />
+                              <label htmlFor="system" className="text-sm">System preference</label>
+                            </div>
+                          </RadioGroup>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={appearanceForm.control}
+                      name="animations"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Animations</FormLabel>
+                            <FormControl>
+                              <Switch 
+                                checked={field.value} 
+                                onCheckedChange={field.onChange} 
+                              />
+                            </FormControl>
+                          </div>
+                          <FormDescription>
+                            Enable animations in the dashboard
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={appearanceForm.control}
+                      name="realtimeUpdates"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Real-time Updates</FormLabel>
+                            <FormControl>
+                              <Switch 
+                                checked={field.value} 
+                                onCheckedChange={field.onChange} 
+                              />
+                            </FormControl>
+                          </div>
+                          <FormDescription>
+                            Update dashboard data in real-time
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={appearanceForm.control}
+                      name="updateFrequency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Update Frequency</FormLabel>
+                          <RadioGroup 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value} 
+                            className="flex flex-col space-y-2"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="1" id="1sec" />
+                              <label htmlFor="1sec" className="text-sm">1 second (may impact performance)</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="5" id="5sec" />
+                              <label htmlFor="5sec" className="text-sm">5 seconds</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="15" id="15sec" />
+                              <label htmlFor="15sec" className="text-sm">15 seconds</label>
+                            </div>
+                          </RadioGroup>
+                        </FormItem>
+                      )}
+                    />
 
-                <Button>Save Changes</Button>
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </form>
+                </Form>
               </CardContent>
             </Card>
           </TabsContent>
