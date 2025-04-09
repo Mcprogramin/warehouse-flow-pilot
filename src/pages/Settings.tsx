@@ -33,7 +33,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-// Define temporary interface for TypeScript while DB types aren't available
+// Define interface for user settings
 interface UserSettings {
   id: string;
   pathfinding_algorithm: string;
@@ -122,7 +122,7 @@ const Settings = () => {
       }
       setUser(data.user);
       
-      // Load user settings - use type assertion to handle TypeScript errors
+      // Load user settings
       try {
         const { data: settingsData, error } = await supabase
           .from('user_settings')
@@ -136,32 +136,32 @@ const Settings = () => {
         }
         
         if (settingsData) {
-          // Use type assertion to handle the type
-          const typedData = settingsData as unknown as UserSettings;
+          // Cast the data to our UserSettings type
+          const settings = settingsData as UserSettings;
           
           // Update system form
           systemForm.reset({
-            algorithmType: typedData.pathfinding_algorithm || "astar",
-            computationPriority: [typedData.computation_priority || 70],
-            dynamicRerouting: typedData.dynamic_rerouting !== null ? typedData.dynamic_rerouting : true,
-            storageStrategy: typedData.storage_strategy || "frequent",
-            autoReorganization: typedData.auto_reorganization !== null ? typedData.auto_reorganization : true
+            algorithmType: settings.pathfinding_algorithm || "astar",
+            computationPriority: [settings.computation_priority || 70],
+            dynamicRerouting: settings.dynamic_rerouting !== null ? settings.dynamic_rerouting : true,
+            storageStrategy: settings.storage_strategy || "frequent",
+            autoReorganization: settings.auto_reorganization !== null ? settings.auto_reorganization : true
           });
           
           // Update robot form
           robotForm.reset({
-            speedLimit: [typedData.speed_limit || 1.2],
-            rechargeThreshold: typedData.recharge_threshold || 20,
-            collisionAvoidance: typedData.collision_avoidance !== null ? typedData.collision_avoidance : true,
-            automatedCharging: typedData.automated_charging !== null ? typedData.automated_charging : true
+            speedLimit: [Number(settings.speed_limit) || 1.2],
+            rechargeThreshold: settings.recharge_threshold || 20,
+            collisionAvoidance: settings.collision_avoidance !== null ? settings.collision_avoidance : true,
+            automatedCharging: settings.automated_charging !== null ? settings.automated_charging : true
           });
           
           // Update appearance form
           appearanceForm.reset({
-            theme: typedData.theme || "light",
-            animations: typedData.animations_enabled !== null ? typedData.animations_enabled : true,
-            realtimeUpdates: typedData.realtime_updates !== null ? typedData.realtime_updates : true,
-            updateFrequency: String(typedData.update_frequency || 5)
+            theme: settings.theme || "light",
+            animations: settings.animations_enabled !== null ? settings.animations_enabled : true,
+            realtimeUpdates: settings.realtime_updates !== null ? settings.realtime_updates : true,
+            updateFrequency: String(settings.update_frequency || 5)
           });
         }
       } catch (error) {
@@ -182,16 +182,19 @@ const Settings = () => {
     
     setIsLoading(true);
     try {
+      // Create an object with the correct database column names
+      const updateData = {
+        pathfinding_algorithm: data.algorithmType,
+        computation_priority: data.computationPriority[0],
+        dynamic_rerouting: data.dynamicRerouting,
+        storage_strategy: data.storageStrategy,
+        auto_reorganization: data.autoReorganization,
+        updated_at: new Date()
+      };
+
       const { error } = await supabase
         .from('user_settings')
-        .update({
-          pathfinding_algorithm: data.algorithmType,
-          computation_priority: data.computationPriority[0],
-          dynamic_rerouting: data.dynamicRerouting,
-          storage_strategy: data.storageStrategy,
-          auto_reorganization: data.autoReorganization,
-          updated_at: new Date()
-        } as unknown as Record<string, any>)
+        .update(updateData)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -215,15 +218,18 @@ const Settings = () => {
     
     setIsLoading(true);
     try {
+      // Create an object with the correct database column names
+      const updateData = {
+        speed_limit: data.speedLimit[0],
+        recharge_threshold: data.rechargeThreshold,
+        collision_avoidance: data.collisionAvoidance,
+        automated_charging: data.automatedCharging,
+        updated_at: new Date()
+      };
+
       const { error } = await supabase
         .from('user_settings')
-        .update({
-          speed_limit: data.speedLimit[0],
-          recharge_threshold: data.rechargeThreshold,
-          collision_avoidance: data.collisionAvoidance,
-          automated_charging: data.automatedCharging,
-          updated_at: new Date()
-        } as unknown as Record<string, any>)
+        .update(updateData)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -247,15 +253,18 @@ const Settings = () => {
     
     setIsLoading(true);
     try {
+      // Create an object with the correct database column names
+      const updateData = {
+        theme: data.theme,
+        animations_enabled: data.animations,
+        realtime_updates: data.realtimeUpdates,
+        update_frequency: parseInt(data.updateFrequency),
+        updated_at: new Date()
+      };
+
       const { error } = await supabase
         .from('user_settings')
-        .update({
-          theme: data.theme,
-          animations_enabled: data.animations,
-          realtime_updates: data.realtimeUpdates,
-          update_frequency: parseInt(data.updateFrequency),
-          updated_at: new Date()
-        } as unknown as Record<string, any>)
+        .update(updateData)
         .eq('id', user.id);
 
       if (error) throw error;

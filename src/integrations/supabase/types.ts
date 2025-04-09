@@ -9,7 +9,63 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      user_settings: {
+        Row: {
+          animations_enabled: boolean | null
+          auto_reorganization: boolean | null
+          automated_charging: boolean | null
+          collision_avoidance: boolean | null
+          computation_priority: number | null
+          created_at: string | null
+          dynamic_rerouting: boolean | null
+          id: string
+          pathfinding_algorithm: string | null
+          realtime_updates: boolean | null
+          recharge_threshold: number | null
+          speed_limit: number | null
+          storage_strategy: string | null
+          theme: string | null
+          update_frequency: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          animations_enabled?: boolean | null
+          auto_reorganization?: boolean | null
+          automated_charging?: boolean | null
+          collision_avoidance?: boolean | null
+          computation_priority?: number | null
+          created_at?: string | null
+          dynamic_rerouting?: boolean | null
+          id: string
+          pathfinding_algorithm?: string | null
+          realtime_updates?: boolean | null
+          recharge_threshold?: number | null
+          speed_limit?: number | null
+          storage_strategy?: string | null
+          theme?: string | null
+          update_frequency?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          animations_enabled?: boolean | null
+          auto_reorganization?: boolean | null
+          automated_charging?: boolean | null
+          collision_avoidance?: boolean | null
+          computation_priority?: number | null
+          created_at?: string | null
+          dynamic_rerouting?: boolean | null
+          id?: string
+          pathfinding_algorithm?: string | null
+          realtime_updates?: boolean | null
+          recharge_threshold?: number | null
+          speed_limit?: number | null
+          storage_strategy?: string | null
+          theme?: string | null
+          update_frequency?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
