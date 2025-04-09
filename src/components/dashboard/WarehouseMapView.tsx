@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ShelfPosition {
   row: number;
@@ -33,9 +34,10 @@ export default function WarehouseMapView({
   mapSize,
 }: WarehouseMapViewProps) {
   const [selectedShelf, setSelectedShelf] = useState<ShelfPosition | null>(null);
+  const isMobile = useIsMobile();
 
-  // Calculate grid cell size based on map dimensions
-  const cellSize = 40;
+  // Calculate grid cell size based on map dimensions and screen size
+  const cellSize = isMobile ? 30 : 40;
   const mapWidth = mapSize.cols * cellSize;
   const mapHeight = mapSize.rows * cellSize;
 
@@ -55,9 +57,9 @@ export default function WarehouseMapView({
   return (
     <Card className="h-full">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <CardTitle className="text-lg">Warehouse Map</CardTitle>
-          <div className="flex space-x-4 text-xs">
+          <div className="flex flex-wrap gap-2 sm:gap-4 text-xs">
             <div className="flex items-center">
               <div className="h-3 w-3 rounded-sm bg-green-100 border border-green-300 mr-1"></div>
               <span>Vacant</span>
@@ -78,7 +80,7 @@ export default function WarehouseMapView({
           className="relative border border-border rounded-md overflow-auto bg-secondary/50"
           style={{
             width: "100%",
-            height: "400px",
+            height: isMobile ? "300px" : "400px",
           }}
         >
           <div
@@ -160,7 +162,7 @@ export default function WarehouseMapView({
         {selectedShelf && (
           <div className="mt-4 p-3 border rounded-md bg-card">
             <h4 className="font-medium text-sm">Shelf Details</h4>
-            <div className="grid grid-cols-3 gap-2 mt-2 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2 text-sm">
               <div>
                 <span className="text-muted-foreground">Position:</span>
                 <div>

@@ -59,23 +59,21 @@ export default function RobotStatusCard({
   };
 
   return (
-    <Card className="transition-all hover:shadow-md overflow-hidden">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Robot {id}</CardTitle>
-          <span
-            className={cn(
-              "px-2 py-1 rounded-full text-xs font-medium",
-              statusColors[status]
-            )}
-          >
-            {statusLabels[status]}
-          </span>
-        </div>
+    <Card className="transition-all hover:shadow-md overflow-hidden h-full">
+      <CardHeader className="pb-2 flex-row items-center justify-between space-y-0">
+        <CardTitle className="text-base">Robot {id}</CardTitle>
+        <span
+          className={cn(
+            "px-2 py-1 rounded-full text-xs font-medium",
+            statusColors[status]
+          )}
+        >
+          {statusLabels[status]}
+        </span>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center space-x-2">
-          <Battery className={cn("h-4 w-4", getBatteryColor(batteryLevel))} />
+          <Battery className={cn("h-4 w-4 flex-shrink-0", getBatteryColor(batteryLevel))} />
           <div className="w-full">
             <div className="flex justify-between text-xs mb-1">
               <span>Battery</span>
@@ -99,18 +97,18 @@ export default function RobotStatusCard({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center text-xs text-muted-foreground">
-            <MapPin className="h-4 w-4 mr-2" />
-            <span>
+        <div className="space-y-2 text-xs">
+          <div className="flex items-center text-muted-foreground">
+            <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="truncate">
               Position: [{position.x}, {position.y}, {position.z}]
             </span>
           </div>
           
           {payload && (
-            <div className="flex items-center text-xs text-muted-foreground">
-              <Package className="h-4 w-4 mr-2" />
-              <span>
+            <div className="flex items-center text-muted-foreground">
+              <Package className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="truncate">
                 Package: {payload.packageId} → {payload.destination}
               </span>
             </div>
