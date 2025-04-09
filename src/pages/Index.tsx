@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { 
   Package2, 
-  Robot, 
+  Bot, 
   Layers3, 
   LineChart
 } from "lucide-react";
@@ -50,7 +49,7 @@ const Index = () => {
           <StatusCard
             title="Active Robots"
             value={overviewStats.activeRobots}
-            icon={<Robot className="h-4 w-4" />}
+            icon={<Bot className="h-4 w-4" />}
             trend={{ value: 12, isPositive: true }}
           />
           <StatusCard

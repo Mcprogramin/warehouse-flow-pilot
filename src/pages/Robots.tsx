@@ -2,6 +2,7 @@
 import Dashboard from "@/components/layout/Dashboard";
 import RobotStatusCard from "@/components/dashboard/RobotStatusCard";
 import { robotsData } from "@/data/mockData";
+import { Bot } from "lucide-react";
 
 const Robots = () => {
   return (

@@ -1,4 +1,3 @@
-
 import { 
   Sidebar, 
   SidebarContent,
@@ -12,7 +11,7 @@ import {
 import { 
   LayoutDashboard, 
   Package, 
-  Robot, 
+  Bot, 
   Layers3, 
   Bell, 
   Settings, 
@@ -42,7 +41,7 @@ export default function AppSidebar({ isCollapsed, toggleSidebar }: AppSidebarPro
     {
       title: "Robots",
       path: "/robots",
-      icon: Robot,
+      icon: Bot,
     },
     {
       title: "Shelves",

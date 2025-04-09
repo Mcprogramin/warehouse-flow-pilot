@@ -46,6 +46,18 @@ export default function RobotStatusCard({
     return "text-error";
   };
 
+  const getProgressColor = (level: number) => {
+    if (level > 70) return "bg-success";
+    if (level > 30) return "bg-warning";
+    return "bg-error";
+  };
+
+  const getProgressBgColor = (level: number) => {
+    if (level > 70) return "bg-success/20";
+    if (level > 30) return "bg-warning/20";
+    return "bg-error/20";
+  };
+
   return (
     <Card className="transition-all hover:shadow-md overflow-hidden">
       <CardHeader className="pb-2">
@@ -72,12 +84,17 @@ export default function RobotStatusCard({
             <Progress 
               value={batteryLevel} 
               className={cn(
-                "h-2", 
-                batteryLevel > 70 ? "bg-success/20" : batteryLevel > 30 ? "bg-warning/20" : "bg-error/20"
+                "h-2",
+                getProgressBgColor(batteryLevel)
               )}
-              indicatorClassName={
-                batteryLevel > 70 ? "bg-success" : batteryLevel > 30 ? "bg-warning" : "bg-error"
-              }
+              style={{
+                backgroundColor: 
+                  batteryLevel > 70 
+                    ? 'hsl(var(--success) / 0.2)' 
+                    : batteryLevel > 30 
+                      ? 'hsl(var(--warning) / 0.2)' 
+                      : 'hsl(var(--error) / 0.2)',
+              }}
             />
           </div>
         </div>
