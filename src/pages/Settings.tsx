@@ -1,7 +1,10 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import Dashboard from "@/components/layout/Dashboard";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Card, 
   CardContent, 
@@ -29,12 +32,10 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 
-// Define the shape of user settings to help TypeScript recognize the structure
+// Define temporary interface for TypeScript while DB types aren't available
 interface UserSettings {
+  id: string;
   pathfinding_algorithm: string;
   computation_priority: number;
   dynamic_rerouting: boolean;
@@ -48,6 +49,30 @@ interface UserSettings {
   animations_enabled: boolean;
   realtime_updates: boolean;
   update_frequency: number;
+  updated_at: Date;
+}
+
+// Define form value interfaces
+interface SystemFormValues {
+  algorithmType: string;
+  computationPriority: number[];
+  dynamicRerouting: boolean;
+  storageStrategy: string;
+  autoReorganization: boolean;
+}
+
+interface RobotFormValues {
+  speedLimit: number[];
+  rechargeThreshold: number;
+  collisionAvoidance: boolean;
+  automatedCharging: boolean;
+}
+
+interface AppearanceFormValues {
+  theme: string;
+  animations: boolean;
+  realtimeUpdates: boolean;
+  updateFrequency: string;
 }
 
 const Settings = () => {
@@ -57,7 +82,7 @@ const Settings = () => {
   const [user, setUser] = useState<any>(null);
 
   // Create form for system settings
-  const systemForm = useForm({
+  const systemForm = useForm<SystemFormValues>({
     defaultValues: {
       algorithmType: "astar",
       computationPriority: [70],
@@ -68,7 +93,7 @@ const Settings = () => {
   });
 
   // Create form for robot settings
-  const robotForm = useForm({
+  const robotForm = useForm<RobotFormValues>({
     defaultValues: {
       speedLimit: [1.2],
       rechargeThreshold: 20,
@@ -78,7 +103,7 @@ const Settings = () => {
   });
 
   // Create form for appearance settings
-  const appearanceForm = useForm({
+  const appearanceForm = useForm<AppearanceFormValues>({
     defaultValues: {
       theme: "light",
       animations: true,
@@ -97,7 +122,7 @@ const Settings = () => {
       }
       setUser(data.user);
       
-      // Load user settings
+      // Load user settings - use type assertion to handle TypeScript errors
       try {
         const { data: settingsData, error } = await supabase
           .from('user_settings')
@@ -111,29 +136,32 @@ const Settings = () => {
         }
         
         if (settingsData) {
+          // Use type assertion to handle the type
+          const typedData = settingsData as unknown as UserSettings;
+          
           // Update system form
           systemForm.reset({
-            algorithmType: settingsData.pathfinding_algorithm || "astar",
-            computationPriority: [settingsData.computation_priority || 70],
-            dynamicRerouting: settingsData.dynamic_rerouting !== null ? settingsData.dynamic_rerouting : true,
-            storageStrategy: settingsData.storage_strategy || "frequent",
-            autoReorganization: settingsData.auto_reorganization !== null ? settingsData.auto_reorganization : true
+            algorithmType: typedData.pathfinding_algorithm || "astar",
+            computationPriority: [typedData.computation_priority || 70],
+            dynamicRerouting: typedData.dynamic_rerouting !== null ? typedData.dynamic_rerouting : true,
+            storageStrategy: typedData.storage_strategy || "frequent",
+            autoReorganization: typedData.auto_reorganization !== null ? typedData.auto_reorganization : true
           });
           
           // Update robot form
           robotForm.reset({
-            speedLimit: [settingsData.speed_limit || 1.2],
-            rechargeThreshold: settingsData.recharge_threshold || 20,
-            collisionAvoidance: settingsData.collision_avoidance !== null ? settingsData.collision_avoidance : true,
-            automatedCharging: settingsData.automated_charging !== null ? settingsData.automated_charging : true
+            speedLimit: [typedData.speed_limit || 1.2],
+            rechargeThreshold: typedData.recharge_threshold || 20,
+            collisionAvoidance: typedData.collision_avoidance !== null ? typedData.collision_avoidance : true,
+            automatedCharging: typedData.automated_charging !== null ? typedData.automated_charging : true
           });
           
           // Update appearance form
           appearanceForm.reset({
-            theme: settingsData.theme || "light",
-            animations: settingsData.animations_enabled !== null ? settingsData.animations_enabled : true,
-            realtimeUpdates: settingsData.realtime_updates !== null ? settingsData.realtime_updates : true,
-            updateFrequency: String(settingsData.update_frequency || 5)
+            theme: typedData.theme || "light",
+            animations: typedData.animations_enabled !== null ? typedData.animations_enabled : true,
+            realtimeUpdates: typedData.realtime_updates !== null ? typedData.realtime_updates : true,
+            updateFrequency: String(typedData.update_frequency || 5)
           });
         }
       } catch (error) {
@@ -147,9 +175,9 @@ const Settings = () => {
     };
     
     checkUser();
-  }, [navigate]);
+  }, [navigate, systemForm, robotForm, appearanceForm, toast]);
 
-  const onSystemSubmit = async (data) => {
+  const onSystemSubmit = async (data: SystemFormValues) => {
     if (!user) return;
     
     setIsLoading(true);
@@ -163,7 +191,7 @@ const Settings = () => {
           storage_strategy: data.storageStrategy,
           auto_reorganization: data.autoReorganization,
           updated_at: new Date()
-        })
+        } as unknown as Record<string, any>)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -171,18 +199,18 @@ const Settings = () => {
         title: "Settings saved",
         description: "Your system settings have been updated successfully.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error saving settings",
-        description: error.message,
+        description: error.message || "An error occurred while saving settings",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const onRobotSubmit = async (data) => {
+  const onRobotSubmit = async (data: RobotFormValues) => {
     if (!user) return;
     
     setIsLoading(true);
@@ -195,7 +223,7 @@ const Settings = () => {
           collision_avoidance: data.collisionAvoidance,
           automated_charging: data.automatedCharging,
           updated_at: new Date()
-        })
+        } as unknown as Record<string, any>)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -203,18 +231,18 @@ const Settings = () => {
         title: "Settings saved",
         description: "Your robot settings have been updated successfully.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error saving settings",
-        description: error.message,
+        description: error.message || "An error occurred while saving settings",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const onAppearanceSubmit = async (data) => {
+  const onAppearanceSubmit = async (data: AppearanceFormValues) => {
     if (!user) return;
     
     setIsLoading(true);
@@ -227,7 +255,7 @@ const Settings = () => {
           realtime_updates: data.realtimeUpdates,
           update_frequency: parseInt(data.updateFrequency),
           updated_at: new Date()
-        })
+        } as unknown as Record<string, any>)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -235,11 +263,11 @@ const Settings = () => {
         title: "Settings saved",
         description: "Your appearance settings have been updated successfully.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error saving settings",
-        description: error.message,
+        description: error.message || "An error occurred while saving settings",
       });
     } finally {
       setIsLoading(false);
@@ -483,7 +511,7 @@ const Settings = () => {
                               <FormControl>
                                 <Input 
                                   type="number" 
-                                  {...field}
+                                  value={field.value}
                                   onChange={(e) => field.onChange(parseInt(e.target.value))}
                                   className="w-16 h-8" 
                                 />
