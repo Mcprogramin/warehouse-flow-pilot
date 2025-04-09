@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Dashboard from "@/components/layout/Dashboard";
 import { 
@@ -31,11 +31,14 @@ import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [user, setUser] = useState(null);
+
   // Create form for system settings
   const systemForm = useForm({
     defaultValues: {
@@ -67,7 +70,62 @@ const Settings = () => {
     }
   });
 
+  // Check authentication status on component mount
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        navigate('/auth');
+        return;
+      }
+      setUser(data.user);
+      
+      // Load user settings
+      const { data: settingsData, error } = await supabase
+        .from('user_settings')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error loading settings:', error);
+        return;
+      }
+      
+      if (settingsData) {
+        // Update system form
+        systemForm.reset({
+          algorithmType: settingsData.pathfinding_algorithm || "astar",
+          computationPriority: [settingsData.computation_priority || 70],
+          dynamicRerouting: settingsData.dynamic_rerouting !== null ? settingsData.dynamic_rerouting : true,
+          storageStrategy: settingsData.storage_strategy || "frequent",
+          autoReorganization: settingsData.auto_reorganization !== null ? settingsData.auto_reorganization : true
+        });
+        
+        // Update robot form
+        robotForm.reset({
+          speedLimit: [settingsData.speed_limit || 1.2],
+          rechargeThreshold: settingsData.recharge_threshold || 20,
+          collisionAvoidance: settingsData.collision_avoidance !== null ? settingsData.collision_avoidance : true,
+          automatedCharging: settingsData.automated_charging !== null ? settingsData.automated_charging : true
+        });
+        
+        // Update appearance form
+        appearanceForm.reset({
+          theme: settingsData.theme || "light",
+          animations: settingsData.animations_enabled !== null ? settingsData.animations_enabled : true,
+          realtimeUpdates: settingsData.realtime_updates !== null ? settingsData.realtime_updates : true,
+          updateFrequency: String(settingsData.update_frequency || 5)
+        });
+      }
+    };
+    
+    checkUser();
+  }, [navigate]);
+
   const onSystemSubmit = async (data) => {
+    if (!user) return;
+    
     setIsLoading(true);
     try {
       const { error } = await supabase
@@ -80,7 +138,7 @@ const Settings = () => {
           auto_reorganization: data.autoReorganization,
           updated_at: new Date()
         })
-        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('id', user.id);
 
       if (error) throw error;
       toast({
@@ -99,6 +157,8 @@ const Settings = () => {
   };
 
   const onRobotSubmit = async (data) => {
+    if (!user) return;
+    
     setIsLoading(true);
     try {
       const { error } = await supabase
@@ -110,7 +170,7 @@ const Settings = () => {
           automated_charging: data.automatedCharging,
           updated_at: new Date()
         })
-        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('id', user.id);
 
       if (error) throw error;
       toast({
@@ -129,6 +189,8 @@ const Settings = () => {
   };
 
   const onAppearanceSubmit = async (data) => {
+    if (!user) return;
+    
     setIsLoading(true);
     try {
       const { error } = await supabase
@@ -140,7 +202,7 @@ const Settings = () => {
           update_frequency: parseInt(data.updateFrequency),
           updated_at: new Date()
         })
-        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('id', user.id);
 
       if (error) throw error;
       toast({
@@ -157,6 +219,20 @@ const Settings = () => {
       setIsLoading(false);
     }
   };
+
+  // If loading or not authenticated yet, show minimal content
+  if (!user) {
+    return (
+      <Dashboard>
+        <div className="space-y-6">
+          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+          <div className="flex h-40 items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </Dashboard>
+    );
+  }
 
   return (
     <Dashboard>
@@ -271,7 +347,7 @@ const Settings = () => {
               </CardHeader>
               <CardContent>
                 <Form {...systemForm}>
-                  <form className="space-y-4">
+                  <form onSubmit={systemForm.handleSubmit(onSystemSubmit)} className="space-y-4">
                     <FormField
                       control={systemForm.control}
                       name="storageStrategy"
@@ -321,7 +397,7 @@ const Settings = () => {
                       )}
                     />
 
-                    <Button disabled={isLoading} onClick={systemForm.handleSubmit(onSystemSubmit)}>
+                    <Button type="submit" disabled={isLoading}>
                       {isLoading ? "Saving..." : "Save Changes"}
                     </Button>
                   </form>

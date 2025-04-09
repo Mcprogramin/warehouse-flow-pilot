@@ -33,10 +33,13 @@ const ProtectedRoute = ({ children }) => {
     );
 
     // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setUser(data.session?.user || null);
       setLoading(false);
-    });
+    };
+    
+    checkSession();
 
     // Cleanup
     return () => subscription.unsubscribe();
