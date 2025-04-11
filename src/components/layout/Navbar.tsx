@@ -1,4 +1,3 @@
-
 import { BellIcon, MenuIcon, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,11 +11,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
+import { useNavigate } from "react-router-dom";
+import { createClient } from "@supabase/supabase-js";
+
+// ⚠️ You should replace this with your own values from the Supabase dashboard
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
 interface NavbarProps {
   toggleSidebar: () => void;
 }
 
 export default function Navbar({ toggleSidebar }: NavbarProps) {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth"); // React Router redirection
+  };
+
   return (
     <header className="border-b bg-card">
       <div className="flex h-16 items-center px-4">
@@ -29,9 +43,9 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
           <MenuIcon className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
         </Button>
-        <h1 className="text-xl font-semibold ml-2 md:ml-0">Smart Warehouse Manager</h1>
+
         <div className="ml-auto flex items-center space-x-4">
-          <div className="hidden md:flex relative w-64">
+          <div className="hidden md:flex relative w-96">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -39,11 +53,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
               className="w-full pl-8"
             />
           </div>
-          <Button variant="ghost" size="icon" className="relative">
-            <BellIcon className="h-5 w-5" />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-error" />
-            <span className="sr-only">Notifications</span>
-          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -55,11 +65,16 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Help</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/settings")}>
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/help")}>
+                Help
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
