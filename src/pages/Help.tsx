@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Dashboard from "@/components/layout/Dashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,18 +24,19 @@ import {
 const Help = () => {
   return (
     <Dashboard>
-      <div className="space-y-6">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-8">
         <div className="flex items-center space-x-2">
           <HelpCircle className="h-6 w-6" />
           <h1 className="text-2xl font-bold tracking-tight">Help Center</h1>
         </div>
         
-        <p className="text-muted-foreground">
-          Find answers to common questions and learn how to use the warehouse management system effectively.
-        </p>
+        <p className="text-muted-foreground text-base leading-relaxed text-center">
+  Find answers to common questions and learn how to use the warehouse management system effectively.
+</p>
+
         
         <Tabs defaultValue="faq" className="w-full">
-          <TabsList className="grid w-full md:w-[400px] grid-cols-2">
+          <TabsList className="grid w-full md:w-[400px] grid-cols-2 mx-auto mb-4">
             <TabsTrigger value="faq" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               <span>FAQ</span>
@@ -47,7 +47,7 @@ const Help = () => {
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="faq" className="space-y-4 mt-6">
+          <TabsContent value="faq" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -60,53 +60,50 @@ const Help = () => {
               </CardHeader>
               <CardContent>
                 <Accordion type="single" collapsible className="w-full">
-                  {/* FAQ Item 1 */}
+                  {/* FAQ Items */}
+                  {/* You can add or remove items here */}
                   <AccordionItem value="item-1">
                     <AccordionTrigger>
-                      Lorem ipsum dolor sit amet?
+                      How do I set up the Robot Communication?
                     </AccordionTrigger>
                     <AccordionContent>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl.
+                      Go to the Settings Page and set the MQTT broker address, port, and topic prefix. Ensure your robot firmware uses the same configuration.
                     </AccordionContent>
                   </AccordionItem>
-                  
-                  {/* FAQ Item 2 */}
+
                   <AccordionItem value="item-2">
                     <AccordionTrigger>
-                      Consectetur adipiscing elit?
+                      How does the robot know where to go?
                     </AccordionTrigger>
                     <AccordionContent>
-                      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                      The robot uses onboard navigation and path-planning logic to calculate the optimal route based on the package’s destination.
                     </AccordionContent>
                   </AccordionItem>
-                  
-                  {/* FAQ Item 3 */}
+
                   <AccordionItem value="item-3">
                     <AccordionTrigger>
-                      Sed do eiusmod tempor incididunt?
+                      How does the system recognize and route packages?
                     </AccordionTrigger>
                     <AccordionContent>
-                      Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                      Computer vision identifies labels or QR codes on packages, then uses a routing algorithm to assign the correct shelf.
                     </AccordionContent>
                   </AccordionItem>
-                  
-                  {/* FAQ Item 4 */}
+
                   <AccordionItem value="item-4">
                     <AccordionTrigger>
-                      Ut labore et dolore magna aliqua?
+                      Can I override package routes?
                     </AccordionTrigger>
                     <AccordionContent>
-                      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                      Yes, from the dashboard, select a package and manually change its destination if needed.
                     </AccordionContent>
                   </AccordionItem>
-                  
-                  {/* FAQ Item 5 */}
+
                   <AccordionItem value="item-5">
                     <AccordionTrigger>
-                      Quis nostrud exercitation ullamco?
+                      Why isn't the robot responding?
                     </AccordionTrigger>
                     <AccordionContent>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                      Check MQTT connection, broker URL, and ensure the robot is powered and listening to the correct topics. Also verify firmware status.
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
@@ -114,7 +111,7 @@ const Help = () => {
             </Card>
           </TabsContent>
           
-          <TabsContent value="instructions" className="space-y-4 mt-6">
+          <TabsContent value="instructions" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -126,42 +123,39 @@ const Help = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Section 1 */}
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Getting Started</h3>
-                  <p className="text-muted-foreground">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold">Getting Started</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    First, configure your MQTT broker in the Settings Page. Then, power on the robots and ensure they are connected to the broker.
                   </p>
                   <ul className="list-disc pl-6 text-muted-foreground">
-                    <li>Lorem ipsum dolor sit amet</li>
-                    <li>Consectetur adipiscing elit</li>
-                    <li>Sed do eiusmod tempor incididunt</li>
+                    <li>Configure MQTT settings in Settings Page</li>
+                    <li>Ensure robot firmware matches MQTT topics</li>
+                    <li>Use the dashboard to track robot status</li>
                   </ul>
                 </div>
 
-                {/* Section 2 */}
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Dashboard Overview</h3>
-                  <p className="text-muted-foreground">
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold">Dashboard Overview</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Use the dashboard to monitor robot positions, package movement, and shelf status in real-time.
                   </p>
                   <ul className="list-disc pl-6 text-muted-foreground">
-                    <li>Ut enim ad minim veniam</li>
-                    <li>Quis nostrud exercitation ullamco</li>
-                    <li>Laboris nisi ut aliquip ex ea commodo</li>
+                    <li>Real-time map for robot tracking</li>
+                    <li>Status cards for package and shelf info</li>
+                    <li>Manual override and logs available</li>
                   </ul>
                 </div>
 
-                {/* Section 3 */}
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Managing Warehouse Settings</h3>
-                  <p className="text-muted-foreground">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold">Managing Warehouse Settings</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Customize system behavior, robot limits, and other parameters from the Settings Page.
                   </p>
                   <ul className="list-disc pl-6 text-muted-foreground">
-                    <li>Duis aute irure dolor in reprehenderit</li>
-                    <li>In voluptate velit esse cillum dolore</li>
-                    <li>Excepteur sint occaecat cupidatat non proident</li>
+                    <li>Set MQTT credentials and topics</li>
+                    <li>Adjust robot speed or boundaries</li>
+                    <li>Enable or disable manual overrides</li>
                   </ul>
                 </div>
               </CardContent>

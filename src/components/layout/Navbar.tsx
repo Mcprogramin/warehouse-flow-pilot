@@ -33,7 +33,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
 
   return (
     <header className="border-b bg-card">
-      <div className="flex h-16 items-center px-4">
+      <div className="flex h-16 items-center px-4 md:px-10">
         <Button 
           variant="ghost" 
           size="icon" 
@@ -45,16 +45,19 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
           <span className="sr-only">Toggle menu</span>
         </Button>
 
-        <div className="font-semibold text-lg ml-4">Warehouse Management</div>
+        
 
-        <div className="ml-auto flex items-center space-x-4">
+        <div className="ml-auto flex items-center space-x-4 border-4 border-black rounded-full">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>WM</AvatarFallback>
-                </Avatar>
-              </Button>
+              <Button
+  variant="ghost"
+  className="relative h-8 w-8 rounded-full border border-black p-0"
+>
+  <Avatar className="h-8 w-8">
+    <AvatarFallback className="text-white bg-slate-800">TT</AvatarFallback>
+  </Avatar>
+</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
