@@ -12,12 +12,9 @@ import {
 import { 
   LayoutDashboard, 
   Settings, 
-  ChevronLeft, 
-  ChevronRight,
   HelpCircle
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 
 interface AppSidebarProps {
   isCollapsed: boolean;
@@ -45,20 +42,12 @@ export default function AppSidebar({ isCollapsed, toggleSidebar }: AppSidebarPro
 
   return (
     <Sidebar className={`bg-sidebar ${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 hidden md:block`}>
-      <SidebarHeader className="flex items-center justify-between px-4 py-4">
+      <SidebarHeader className="flex items-center justify-center px-4 py-4">
         {!isCollapsed && (
           <div className="flex items-center">
             <span className="ml-2 text-lg font-semibold text-sidebar-foreground">Warehouse</span>
           </div>
         )}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={toggleSidebar} 
-          className="text-sidebar-foreground hover:bg-sidebar-accent"
-        >
-          {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
-        </Button>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

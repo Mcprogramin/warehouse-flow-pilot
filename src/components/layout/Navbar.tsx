@@ -39,6 +39,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
           size="icon" 
           className="md:hidden" 
           onClick={toggleSidebar}
+          aria-label="Toggle menu"
         >
           <MenuIcon className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
