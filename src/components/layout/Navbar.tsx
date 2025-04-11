@@ -1,6 +1,6 @@
-import { BellIcon, MenuIcon, SearchIcon } from "lucide-react";
+
+import { BellIcon, MenuIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,16 +44,9 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
           <span className="sr-only">Toggle menu</span>
         </Button>
 
-        <div className="ml-auto flex items-center space-x-4">
-          <div className="hidden md:flex relative w-96">
-            <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="w-full pl-8"
-            />
-          </div>
+        <div className="font-semibold text-lg ml-4">Warehouse Management</div>
 
+        <div className="ml-auto flex items-center space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
