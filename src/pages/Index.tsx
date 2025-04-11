@@ -10,7 +10,7 @@ import StatusCard from "@/components/dashboard/StatusCard";
 import RobotStatusCard from "@/components/dashboard/RobotStatusCard";
 import PackageStatusTable from "@/components/dashboard/PackageStatusTable";
 import WarehouseMapView from "@/components/dashboard/WarehouseMapView";
-import NotificationFeed from "@/components/dashboard/NotificationFeed";
+
 import PerformanceChart from "@/components/dashboard/PerformanceChart";
 import { 
   overviewStats, 
@@ -115,11 +115,7 @@ const Index = () => {
 
           {/* Notifications Sidebar */}
           <div className="space-y-6">
-            <NotificationFeed
-              notifications={notifications}
-              onMarkAsRead={handleMarkAsRead}
-              onMarkAllAsRead={handleMarkAllAsRead}
-            />
+            
           </div>
         </div>
       </div>
