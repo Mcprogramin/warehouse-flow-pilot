@@ -13,7 +13,8 @@ import {
   LayoutDashboard, 
   Settings, 
   ChevronLeft, 
-  ChevronRight 
+  ChevronRight,
+  HelpCircle
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,11 @@ export default function AppSidebar({ isCollapsed, toggleSidebar }: AppSidebarPro
       path: "/settings",
       icon: Settings,
     },
+    {
+      title: "Help",
+      path: "/help",
+      icon: HelpCircle,
+    }
   ];
 
   return (
