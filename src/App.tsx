@@ -7,10 +7,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
-import Packages from "./pages/Packages";
-import Robots from "./pages/Robots";
-import Shelves from "./pages/Shelves";
-import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -72,26 +68,6 @@ const App = () => (
           <Route path="/" element={
             <ProtectedRoute>
               <Index />
-            </ProtectedRoute>
-          } />
-          <Route path="/packages" element={
-            <ProtectedRoute>
-              <Packages />
-            </ProtectedRoute>
-          } />
-          <Route path="/robots" element={
-            <ProtectedRoute>
-              <Robots />
-            </ProtectedRoute>
-          } />
-          <Route path="/shelves" element={
-            <ProtectedRoute>
-              <Shelves />
-            </ProtectedRoute>
-          } />
-          <Route path="/notifications" element={
-            <ProtectedRoute>
-              <Notifications />
             </ProtectedRoute>
           } />
           <Route path="/settings" element={

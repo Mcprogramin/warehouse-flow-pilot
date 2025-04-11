@@ -1,3 +1,4 @@
+
 import { 
   Sidebar, 
   SidebarContent,
@@ -10,10 +11,6 @@ import {
 } from "@/components/ui/sidebar";
 import { 
   LayoutDashboard, 
-  Package, 
-  Bot, 
-  Layers3, 
-  Bell, 
   Settings, 
   ChevronLeft, 
   ChevronRight 
@@ -34,26 +31,6 @@ export default function AppSidebar({ isCollapsed, toggleSidebar }: AppSidebarPro
       icon: LayoutDashboard,
     },
     {
-      title: "Packages",
-      path: "/packages",
-      icon: Package,
-    },
-    {
-      title: "Robots",
-      path: "/robots",
-      icon: Bot,
-    },
-    {
-      title: "Shelves",
-      path: "/shelves",
-      icon: Layers3,
-    },
-    {
-      title: "Notifications",
-      path: "/notifications",
-      icon: Bell,
-    },
-    {
       title: "Settings",
       path: "/settings",
       icon: Settings,
@@ -65,7 +42,6 @@ export default function AppSidebar({ isCollapsed, toggleSidebar }: AppSidebarPro
       <SidebarHeader className="flex items-center justify-between px-4 py-4">
         {!isCollapsed && (
           <div className="flex items-center">
-            <Package className="h-6 w-6 text-sidebar-foreground" />
             <span className="ml-2 text-lg font-semibold text-sidebar-foreground">Warehouse</span>
           </div>
         )}
