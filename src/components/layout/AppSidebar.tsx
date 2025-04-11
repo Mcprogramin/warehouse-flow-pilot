@@ -44,7 +44,7 @@ export default function AppSidebar({ isCollapsed, toggleSidebar }: AppSidebarPro
   ];
 
   return (
-    <Sidebar className={`bg-sidebar ${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300`}>
+    <Sidebar className={`bg-sidebar ${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 hidden md:block`}>
       <SidebarHeader className="flex items-center justify-between px-4 py-4">
         {!isCollapsed && (
           <div className="flex items-center">

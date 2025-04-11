@@ -2,8 +2,6 @@ import { useState } from "react";
 import { 
   Package2, 
   Bot, 
-  Layers3, 
-  LineChart,
   Map
 } from "lucide-react";
 import Dashboard from "@/components/layout/Dashboard";
@@ -16,35 +14,19 @@ import {
   overviewStats, 
   robotsData, 
   packagesData, 
-  shelfData, 
   robotPositions, 
-  notificationsData
+  shelfData 
 } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
-  const [notifications, setNotifications] = useState(notificationsData);
   const [activeSection, setActiveSection] = useState<'robots' | 'map' | 'packages'>('robots');
-
-  const handleMarkAsRead = (id: string) => {
-    setNotifications(
-      notifications.map((notification) =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
-    );
-  };
-
-  const handleMarkAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({ ...notification, read: true }))
-    );
-  };
 
   return (
     <Dashboard>
       <div className="space-y-6">
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <StatusCard
             title="Active Robots"
             value={overviewStats.activeRobots}
@@ -57,45 +39,35 @@ const Index = () => {
             icon={<Package2 className="h-4 w-4" />}
             trend={{ value: 8, isPositive: true }}
           />
-          <StatusCard
-            title="Shelves Occupied"
-            value={`${overviewStats.shelvesOccupied}/200`}
-            icon={<Layers3 className="h-4 w-4" />}
-            description="63.5% capacity used"
-          />
-          <StatusCard
-            title="Error Rate"
-            value={`${overviewStats.errorRate}%`}
-            icon={<LineChart className="h-4 w-4" />}
-            trend={{ value: 0.3, isPositive: false }}
-            className="bg-error/5"
-          />
         </div>
 
         {/* Section Navigation */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap justify-center gap-3">
           <Button 
             variant={activeSection === 'robots' ? 'default' : 'outline'} 
             onClick={() => setActiveSection('robots')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 min-w-32"
+            size="lg"
           >
-            <Bot className="h-4 w-4" />
+            <Bot className="h-5 w-5" />
             Robot Status
           </Button>
           <Button 
             variant={activeSection === 'map' ? 'default' : 'outline'} 
             onClick={() => setActiveSection('map')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 min-w-32"
+            size="lg"
           >
-            <Map className="h-4 w-4" />
+            <Map className="h-5 w-5" />
             Warehouse Map
           </Button>
           <Button 
             variant={activeSection === 'packages' ? 'default' : 'outline'} 
             onClick={() => setActiveSection('packages')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 min-w-32"
+            size="lg"
           >
-            <Package2 className="h-4 w-4" />
+            <Package2 className="h-5 w-5" />
             Package Tracking
           </Button>
         </div>
@@ -114,6 +86,7 @@ const Index = () => {
                     status={robot.status}
                     position={robot.position}
                     payload={robot.payload}
+                    batteryLevel={robot.batteryLevel}
                   />
                 ))}
               </div>
