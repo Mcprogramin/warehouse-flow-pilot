@@ -49,7 +49,7 @@ interface UserSettings {
   animations_enabled: boolean;
   realtime_updates: boolean;
   update_frequency: number;
-  updated_at: Date;
+  updated_at: string; // Changed from Date to string to match the database schema
 }
 
 // Define form value interfaces
@@ -136,8 +136,8 @@ const Settings = () => {
         }
         
         if (settingsData) {
-          // Cast the data to our UserSettings type
-          const settings = settingsData as UserSettings;
+          // Explicitly cast the data to our UserSettings type
+          const settings = settingsData as unknown as UserSettings;
           
           // Update system form
           systemForm.reset({
@@ -189,7 +189,7 @@ const Settings = () => {
         dynamic_rerouting: data.dynamicRerouting,
         storage_strategy: data.storageStrategy,
         auto_reorganization: data.autoReorganization,
-        updated_at: new Date()
+        updated_at: new Date().toISOString() // Convert Date to ISO string
       };
 
       const { error } = await supabase
@@ -224,7 +224,7 @@ const Settings = () => {
         recharge_threshold: data.rechargeThreshold,
         collision_avoidance: data.collisionAvoidance,
         automated_charging: data.automatedCharging,
-        updated_at: new Date()
+        updated_at: new Date().toISOString() // Convert Date to ISO string
       };
 
       const { error } = await supabase
@@ -259,7 +259,7 @@ const Settings = () => {
         animations_enabled: data.animations,
         realtime_updates: data.realtimeUpdates,
         update_frequency: parseInt(data.updateFrequency),
-        updated_at: new Date()
+        updated_at: new Date().toISOString() // Convert Date to ISO string
       };
 
       const { error } = await supabase
