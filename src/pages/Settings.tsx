@@ -31,47 +31,15 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-// Database schema types
-interface UserSettings {
-  id: string;
-  pathfinding_algorithm: string;
-  computation_priority: number;
-  dynamic_rerouting: boolean;
-  storage_strategy: string;
-  auto_reorganization: boolean;
-  theme: string;
-  animations_enabled: boolean;
-  realtime_updates: boolean;
-  update_frequency: number;
-  updated_at: string;
-}
-
-// Form value types
-interface SystemFormValues {
-  algorithmType: string;
-  computationPriority: number[];
-  dynamicRerouting: boolean;
-  storageStrategy: string;
-  autoReorganization: boolean;
-}
-
-interface AppearanceFormValues {
-  theme: string;
-  animations: boolean;
-  realtimeUpdates: boolean;
-  updateFrequency: string;
-}
-
 const Settings = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [mqttClient, setMqttClient] = useState<any>(null);
   const [messages, setMessages] = useState<string[]>([]);
 
   // Form instances with default values
-  const systemForm = useForm<SystemFormValues>({
+  const systemForm = useForm({
     defaultValues: {
       algorithmType: "astar",
       computationPriority: [70],
@@ -80,8 +48,7 @@ const Settings = () => {
       autoReorganization: true,
     },
   });
-
-  const appearanceForm = useForm<AppearanceFormValues>({
+  const appearanceForm = useForm({
     defaultValues: {
       theme: "light",
       animations: true,
@@ -98,13 +65,10 @@ const Settings = () => {
         .select("*")
         .eq("id", userId)
         .single();
-
       if (error) throw error;
       if (!settingsData) return;
 
-      const settings = settingsData as UserSettings;
-
-      // Update all forms with loaded settings
+      const settings = settingsData as any;
       systemForm.reset({
         algorithmType: settings.pathfinding_algorithm || "astar",
         computationPriority: [settings.computation_priority || 70],
@@ -112,7 +76,6 @@ const Settings = () => {
         storageStrategy: settings.storage_strategy || "frequent",
         autoReorganization: settings.auto_reorganization ?? true,
       });
-
       appearanceForm.reset({
         theme: settings.theme || "light",
         animations: settings.animations_enabled ?? true,
@@ -149,7 +112,7 @@ const Settings = () => {
   }, [navigate, toast]);
 
   // Generic save handler for user settings
-  const saveSettings = async (updateData: Partial<UserSettings>) => {
+  const saveSettings = async (updateData: any) => {
     if (!user) return;
     setIsLoading(true);
     try {
@@ -157,9 +120,7 @@ const Settings = () => {
         .from("user_settings")
         .update({ ...updateData, updated_at: new Date().toISOString() })
         .eq("id", user.id);
-
       if (error) throw error;
-
       toast({
         title: "Settings saved",
         description: "Your settings have been updated successfully.",
@@ -177,7 +138,7 @@ const Settings = () => {
   };
 
   // Form submission handlers
-  const onSystemSubmit = async (data: SystemFormValues) => {
+  const onSystemSubmit = async (data: any) => {
     await saveSettings({
       pathfinding_algorithm: data.algorithmType,
       computation_priority: data.computationPriority[0],
@@ -186,8 +147,7 @@ const Settings = () => {
       auto_reorganization: data.autoReorganization,
     });
   };
-
-  const onAppearanceSubmit = async (data: AppearanceFormValues) => {
+  const onAppearanceSubmit = async (data: any) => {
     await saveSettings({
       theme: data.theme,
       animations_enabled: data.animations,
@@ -197,79 +157,69 @@ const Settings = () => {
   };
 
   // MQTT Functions
-  const startConnect = () => {
+  const startConnect = async () => {
     const host = (document.getElementById("host") as HTMLInputElement).value;
     const port = (document.getElementById("port") as HTMLInputElement).value;
     const username = (document.getElementById("username") as HTMLInputElement).value;
     const password = (document.getElementById("password") as HTMLInputElement).value;
     const topic_s = (document.getElementById("topic_s") as HTMLInputElement).value;
 
-    const clientID = "clientID-" + Math.floor(Math.random() * 100);
-    setMessages((prev) => [
-      ...prev,
-      `Connecting to ${host} on port ${port}`,
-      `Using the client ID ${clientID}`,
-    ]);
+    try {
+      const response = await fetch("http://localhost:3001/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ host, port, username, password, topic: topic_s }),
+      });
 
-    const client = new Paho.MQTT.Client(host, Number(port), clientID);
-
-    client.onConnectionLost = (responseObject) => {
-      setMessages((prev) => [...prev, "ERROR: Connection is lost."]);
-      if (responseObject.errorMessage) {
-        setMessages((prev) => [...prev, `ERROR: ${responseObject.errorMessage}`]);
+      const result = await response.json();
+      if (response.ok) {
+        setMessages((prev) => [...prev, result.message]);
+      } else {
+        setMessages((prev) => [...prev, `ERROR: ${result.message}`]);
       }
-    };
-
-    client.onMessageArrived = (message) => {
-      console.log("OnMessageArrived: ", message.payloadString);
-      setMessages((prev) => [
-        ...prev,
-        `Topic: ${message.destinationName} | Message: ${message.payloadString}`,
-      ]);
-    };
-
-    client.connect({
-      onSuccess: () => {
-        setMessages((prev) => [...prev, `Connected successfully.`]);
-        setMessages((prev) => [...prev, `Subscribing to topic ${topic_s}`]);
-        client.subscribe(topic_s);
-      },
-      userName: username || undefined,
-      password: password || undefined,
-      useSSL: Number(port) === 8083, // Use SSL for WebSocket ports
-      onFailure: (error) => {
-        setMessages((prev) => [
-          ...prev,
-          `ERROR: Failed to connect - ${error.errorMessage}`,
-        ]);
-      },
-    });
-
-    setMqttClient(client);
-  };
-
-  const startDisconnect = () => {
-    if (mqttClient) {
-      mqttClient.disconnect();
-      setMqttClient(null);
-      setMessages((prev) => [...prev, "Disconnected."]);
+    } catch (error) {
+      setMessages((prev) => [...prev, "ERROR: Failed to connect to MQTT broker."]);
     }
   };
 
-  const publishMessage = () => {
-    if (!mqttClient) {
-      setMessages((prev) => [...prev, "ERROR: Not connected to MQTT broker."]);
-      return;
-    }
+  const startDisconnect = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/disconnect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
 
+      const result = await response.json();
+      if (response.ok) {
+        setMessages((prev) => [...prev, result.message]);
+      } else {
+        setMessages((prev) => [...prev, `ERROR: ${result.message}`]);
+      }
+    } catch (error) {
+      setMessages((prev) => [...prev, "ERROR: Failed to disconnect from MQTT broker."]);
+    }
+  };
+
+  const publishMessage = async () => {
     const topic_p = (document.getElementById("topic_p") as HTMLInputElement).value;
     const msg = (document.getElementById("Message") as HTMLInputElement).value;
 
-    const message = new Paho.MQTT.Message(msg);
-    message.destinationName = topic_p;
-    mqttClient.send(message);
+    try {
+      const response = await fetch("http://localhost:3001/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: topic_p, message: msg }),
+      });
 
-    setMessages((prev) => [...prev, `Message to topic ${topic_p} is sent`]);
+      const result = await response.json();
+      if (response.ok) {
+        setMessages((prev) => [...prev, result.message]);
+      } else {
+        setMessages((prev) => [...prev, `ERROR: ${result.message}`]);
+      }
+    } catch (error) {
+      setMessages((prev) => [...prev, "ERROR: Failed to publish message."]);
+    }
   };
 
   // Loading state
