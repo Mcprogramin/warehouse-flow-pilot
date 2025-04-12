@@ -162,12 +162,13 @@ const MQTTDashboard: React.FC = () => {
 
   return (
     <Dashboard>
-      <div className="container mx-auto py-6 space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">Robots</h1>
+      <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-8">
+        <div className="flex items-center gap-2">
+          <SettingsIcon className="w-8 h-8 text-primary" />
+          <h1 className="text-3xl font-bold">Settings</h1>
         </div>
 
-        <div className="flex flex-col gap-2 text-center">
+        <div className="text-center">
           <p className="text-muted-foreground">
             Connect to MQTT brokers and publish/subscribe to topics
           </p>

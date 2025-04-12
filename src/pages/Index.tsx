@@ -1,30 +1,36 @@
 import { useState } from "react";
 import { 
   Package2, 
-  Bot, 
-  Map
+  Bot
 } from "lucide-react";
 import Dashboard from "@/components/layout/Dashboard";
 import StatusCard from "@/components/dashboard/StatusCard";
 import RobotStatusCard from "@/components/dashboard/RobotStatusCard";
 import PackageStatusTable from "@/components/dashboard/PackageStatusTable";
-import WarehouseMapView from "@/components/dashboard/WarehouseMapView";
 
 import { 
   overviewStats, 
   robotsData, 
-  packagesData, 
-  robotPositions, 
-  shelfData 
+  packagesData
 } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
-  const [activeSection, setActiveSection] = useState<'robots' | 'map' | 'packages'>('robots');
+  const [activeSection, setActiveSection] = useState<'robots' | 'packages'>('robots');
 
   return (
     <Dashboard>
-      <div className="space-y-6">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+        </div>
+
+        <div className="text-center">
+          <p className="text-muted-foreground">
+            Monitor and manage your warehouse operations in real-time
+          </p>
+        </div>
+
         {/* Overview Stats */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <StatusCard
@@ -53,15 +59,6 @@ const Index = () => {
             Robot Status
           </Button>
           <Button 
-            variant={activeSection === 'map' ? 'default' : 'outline'} 
-            onClick={() => setActiveSection('map')}
-            className="flex items-center gap-2 min-w-32"
-            size="lg"
-          >
-            <Map className="h-5 w-5" />
-            Warehouse Map
-          </Button>
-          <Button 
             variant={activeSection === 'packages' ? 'default' : 'outline'} 
             onClick={() => setActiveSection('packages')}
             className="flex items-center gap-2 min-w-32"
@@ -77,8 +74,8 @@ const Index = () => {
           {/* Robots Status Cards */}
           {activeSection === 'robots' && (
             <div>
-              <h2 className="text-lg font-semibold mb-4">Robot Status</h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <h2 className="text-lg font-semibold">Robot Status</h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 mt-4">
                 {robotsData.map((robot) => (
                   <RobotStatusCard
                     key={robot.id}
@@ -93,23 +90,13 @@ const Index = () => {
             </div>
           )}
 
-          {/* Warehouse Map */}
-          {activeSection === 'map' && (
-            <div>
-              <h2 className="text-lg font-semibold mb-4">Warehouse Map</h2>
-              <WarehouseMapView 
-                shelves={shelfData} 
-                robots={robotPositions} 
-                mapSize={{ rows: 12, cols: 16 }}
-              />
-            </div>
-          )}
-
-          {/* Packages Table - Keep only the first example */}
+          {/* Packages Table */}
           {activeSection === 'packages' && (
             <div>
-              <h2 className="text-lg font-semibold mb-4">Package Tracking</h2>
-              <PackageStatusTable packages={packagesData.slice(0, 1)} />
+              <h2 className="text-lg font-semibold">Package Tracking</h2>
+              <div className="mt-4">
+                <PackageStatusTable packages={packagesData.slice(0, 1)} />
+              </div>
             </div>
           )}
         </div>

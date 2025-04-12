@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Dashboard from "@/components/layout/Dashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GlowingTabTrigger } from "@/components/ui/glowing-tab-trigger";
 import { 
   Card, 
   CardContent, 
@@ -25,26 +26,34 @@ const Help = () => {
   return (
     <Dashboard>
       <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-8">
-        <div className="flex items-center space-x-2">
-          <HelpCircle className="h-6 w-6" />
-          <h1 className="text-2xl font-bold tracking-tight">Help Center</h1>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold">Help Center</h1>
         </div>
         
         <p className="text-muted-foreground text-base leading-relaxed text-center">
-  Find answers to common questions and learn how to use the warehouse management system effectively.
-</p>
+          Find answers to common questions and learn how to use the warehouse management system effectively.
+        </p>
 
-        
         <Tabs defaultValue="faq" className="w-full">
           <TabsList className="grid w-full md:w-[400px] grid-cols-2 mx-auto mb-4">
-            <TabsTrigger value="faq" className="flex items-center gap-2">
+            <GlowingTabTrigger 
+              value="faq" 
+              className="flex items-center gap-2"
+              glowColor="rgba(59, 130, 246, 0.3)"
+              hoverGlowColor="rgba(59, 130, 246, 0.5)"
+            >
               <MessageSquare className="h-4 w-4" />
               <span>FAQ</span>
-            </TabsTrigger>
-            <TabsTrigger value="instructions" className="flex items-center gap-2">
+            </GlowingTabTrigger>
+            <GlowingTabTrigger 
+              value="instructions" 
+              className="flex items-center gap-2"
+              glowColor="rgba(59, 130, 246, 0.3)"
+              hoverGlowColor="rgba(59, 130, 246, 0.5)"
+            >
               <BookOpen className="h-4 w-4" />
               <span>Instructions</span>
-            </TabsTrigger>
+            </GlowingTabTrigger>
           </TabsList>
           
           <TabsContent value="faq" className="space-y-4">
@@ -76,7 +85,7 @@ const Help = () => {
                       How does the robot know where to go?
                     </AccordionTrigger>
                     <AccordionContent>
-                      The robot uses onboard navigation and path-planning logic to calculate the optimal route based on the package’s destination.
+                      The robot uses onboard navigation and path-planning logic to calculate the optimal route based on the package's destination.
                     </AccordionContent>
                   </AccordionItem>
 

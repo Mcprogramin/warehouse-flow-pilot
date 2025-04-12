@@ -1,11 +1,10 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -14,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 217 60% 50%;
+    --primary: 217 91% 60%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -23,7 +22,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 217 70% 55%;
+    --accent: 217 91% 65%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,13 +30,13 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 217 91% 60%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 217 60% 15%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 60% 50%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 210 40% 98%;
     --sidebar-accent: 217 60% 25%;
     --sidebar-accent-foreground: 210 40% 98%;
@@ -55,7 +54,7 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 60% 50%;
+    --primary: 217 91% 60%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -64,7 +63,7 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217 70% 55%;
+    --accent: 217 91% 65%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -76,7 +75,7 @@
     
     --sidebar-background: 223 47% 11%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217 60% 50%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 210 40% 98%;
     --sidebar-accent: 223 47% 15%;
     --sidebar-accent-foreground: 210 40% 98%;
@@ -92,6 +91,11 @@
 
   body {
     @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(var(--primary) / 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(var(--primary) / 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(var(--primary) / 0.05) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(var(--primary) / 0.05) 0px, transparent 50%);
   }
 }
 

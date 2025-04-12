@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="16" cy="16" r="16" fill="#3B82F6"/>
+  
+  <!-- Warehouse Building -->
+  <path d="M8 12V20H24V12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M8 20L16 24L24 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Robot -->
+  <circle cx="16" cy="16" r="4" fill="white"/>
+  <circle cx="16" cy="16" r="2" fill="#3B82F6"/>
+  
+  <!-- Movement Lines -->
+  <path d="M12 16H20" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M16 12V20" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg> 

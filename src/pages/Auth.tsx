@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -12,7 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BookmarkCheckIcon, PackageCheckIcon } from "lucide-react";
+import { BookmarkCheckIcon, PackageCheckIcon, Moon, Sun } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
+import { GlowingButton } from "@/components/ui/glowing-button";
 
 // Schema for login
 const loginSchema = z.object({
@@ -35,6 +36,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const { theme, toggleTheme } = useTheme();
 
   // Login form
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -116,7 +118,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center space-y-2 text-center">
           <div className="rounded-full bg-primary p-2">
@@ -124,6 +126,25 @@ const Auth = () => {
           </div>
           <h1 className="text-3xl font-bold">Warehouse Management</h1>
           <p className="text-muted-foreground">Efficiently manage your warehouse operations</p>
+        </div>
+
+        {/* Theme Toggle Button */}
+        <div className="flex justify-center">
+          <GlowingButton
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="relative h-8 w-8 rounded-full border border-border/50 hover:border-border transition-colors duration-200"
+            aria-label="Toggle theme"
+            glowColor={theme === 'dark' ? 'rgba(251, 191, 36, 0.5)' : 'rgba(59, 130, 246, 0.5)'}
+            hoverGlowColor={theme === 'dark' ? 'rgba(251, 191, 36, 0.8)' : 'rgba(59, 130, 246, 0.8)'}
+          >
+            {theme === 'dark' ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </GlowingButton>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
